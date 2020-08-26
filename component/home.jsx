@@ -1,9 +1,8 @@
-import React from 'react';
-import Select from 'react-select';
+import React, { Fragment } from 'react'
 import { Navbar } from 'react-bootstrap';
 import {Nav} from 'react-bootstrap';
-import { Router, Route, Link, browserHistory, IndexRoute } from 'react-router';
-import axios from 'axios';
+import { browserHistory } from 'react-router';
+
 
 class HomeComponent extends React.Component {
 
@@ -14,7 +13,8 @@ class HomeComponent extends React.Component {
   var today = new Date(),
   date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
         this.state = {
-            username:this.props.location.state,
+           // username:this.props.location.state,
+           username: localStorage.getItem('loggedinUser'),
             date:date
           }
     
@@ -23,16 +23,12 @@ class HomeComponent extends React.Component {
       
         
    render() {   
-    let h2Style = {
-        color: 'White',
-  }   	 
-
-  let activeStyle = { color: '#ff3333' };
+   
       return ( 
-          <div>          
+          <Fragment>          
          <Navbar bg="dark" variant="dark"  >
-          <h6 style={h2Style}>Claim Management System</h6>
-        <Nav className="ml-auto">
+         <h6 style={{color: "white"}}>Claim Management System</h6>
+        <Nav className="ml-auto"> 
       <Nav.Link >Welcome User!! {this.state.username}</Nav.Link>
       <Nav.Link >{this.state.date}</Nav.Link>
       <Nav.Link onClick={() => browserHistory.push('login')}>Log Out</Nav.Link>
@@ -41,10 +37,10 @@ class HomeComponent extends React.Component {
       
       <Navbar bg="dark" variant="dark"  >
         <Nav className="mr-auto">
-      <Nav.Link href="#home"  style={activeStyle}>Home</Nav.Link>
-      <Nav.Link onClick={() => browserHistory.push('viewclaimsummary')} >Update Claim Summary</Nav.Link>
+      <Nav.Link href="#home"  style={{color: "red"}}>Home</Nav.Link>
+      <Nav.Link onClick={() => browserHistory.push('viewclaimsummary')} >Update Claim</Nav.Link>
       <Nav.Link onClick={() => browserHistory.push('about')}>About</Nav.Link>
-      <Nav.Link onClick={() => browserHistory.push('contact')}>Contact Us</Nav.Link>
+      <Nav.Link onClick={() => browserHistory.push('contact')} >Contact Us</Nav.Link>
         </Nav>
         </Navbar> 
         <div >
@@ -53,7 +49,7 @@ class HomeComponent extends React.Component {
         <div className="fixed-footer">
             <div className="container_hf">Copyright &copy; 2020</div>        
         </div>
-</div>
+</Fragment>
  
       );
    }

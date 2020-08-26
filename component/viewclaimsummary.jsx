@@ -1,13 +1,13 @@
-import React from 'react';
+/* eslint-disable react/jsx-key */
+/* eslint-disable react/prop-types */
+import React, { Fragment } from 'react'
 import { Navbar } from 'react-bootstrap';
 import {Nav} from 'react-bootstrap';
 import {Table} from  'react-bootstrap';
-import axios from 'axios';
-import { Router, Route, Link, browserHistory, IndexRoute  } 
+import {  Link, browserHistory  } 
 from 'react-router';
-import LoginComponent from './login.jsx';
 import { connect } from "react-redux";
-import { GetClaimList } from "../actions/claimListAction.js";
+import { fetchClaimList } from "../actions/claimListAction.js";
 
 
 class ViewClaimSummary extends React.Component {
@@ -21,52 +21,26 @@ class ViewClaimSummary extends React.Component {
   this.state = {
     claimList: [],
     date: date,
-    username:this.props.location.state
+    username: localStorage.getItem('loggedinUser')
 };
 
-};
+}
 
 
- //Load claim summary data from claims json
-     componentDidMount() {
-       
-        
-              const claims =this.props.GetClaimList();
-              console.log(this.props.claimList);
-              const claimList = this.props.claimList.map(u =>
-            
-                <tr>
-                <td>{u.id}</td>
-                <td>{u.name}</td>
-                <td>{u.claimno}</td>
-                <td >{u.claimtype}</td>
-                <td >{u.claimdesc}</td>
-                <td>{u.claimstartdate}</td>
-                <td>{u.claimenddate}</td>
-               <td><Link to={{
-                pathname: 'updateclaim',
-                state: [{empid: u.id, empname: u.name ,claimno:u.claimno,claimtype:u.claimtype,
-                  claimdesc:u.claimdesc,claimstartdate:u.claimstartdate,claimenddate:u.claimenddate,username:this.state.username}],
-                }}> Update </Link></td>
-            </tr>
-                )
-            this.setState({ claimList });
-          // })
-      }
-    //   handleClick(id, e){
-    //     this.state.selectedId=id;
-    // }
+componentDidMount(){
+  this.props.dispatch(fetchClaimList());
+ }
+
 
    render() {  
-    let h2Style = {
-      color: 'White',
-}
-let activeStyle = { color: '#ff3333' };
-const { showHideHome, showHideAbout, showHideContact } = this.state;
+     
+const { error, loading, claimList } = this.props;
+    if(!loading){
       return ( 
-          <div>
+
+        <Fragment>
         <Navbar bg="dark" variant="dark"  >
-          <h6 style={h2Style}>Claim Management System</h6>
+        <h6 style={{color: "white"}}>Claim Management System</h6>
         <Nav className="ml-auto">
       <Nav.Link >Welcome User!! {this.state.username}</Nav.Link>
       <Nav.Link >{this.state.date}</Nav.Link>
@@ -77,7 +51,7 @@ const { showHideHome, showHideAbout, showHideContact } = this.state;
       <Navbar bg="dark" variant="dark"  >
         <Nav className="mr-auto">
         <Nav.Link onClick={() => browserHistory.push('home')}>Home</Nav.Link>
-      <Nav.Link  style={activeStyle} onClick={() => browserHistory.push('viewclaimsummary')} >Update Claim Summary</Nav.Link>
+      <Nav.Link  style={{color: "red"}} onClick={() => browserHistory.push('viewclaimsummary')} >Update Claim</Nav.Link>
       <Nav.Link onClick={() => browserHistory.push('about')}>About</Nav.Link>
       <Nav.Link onClick={() => browserHistory.push('contact')}>Contact Us</Nav.Link>
         </Nav>
@@ -99,7 +73,27 @@ const { showHideHome, showHideAbout, showHideContact } = this.state;
         </thead>
   
       <tbody>
-       {this.state.claimList}
+       {/* {this.state.claimList} */}
+
+       { 
+            claimList.map(u =>
+
+              <tr>
+              <td>{u.id}</td>
+              <td>{u.name}</td>
+              <td>{u.claimno}</td>
+              <td >{u.claimtype}</td>
+              <td >{u.claimdesc}</td>
+              <td>{u.claimstartdate}</td>
+              <td>{u.claimenddate}</td>
+              <td><Link to={{
+              pathname: 'updateclaim',
+              state: [{empid: u.id, empname: u.name ,claimno:u.claimno,claimtype:u.claimtype,
+              claimdesc:u.claimdesc,claimstartdate:u.claimstartdate,claimenddate:u.claimenddate,username:this.state.username}],
+              }}> Update </Link></td>
+              </tr>
+            )
+       }       
       </tbody>
   
   </Table>
@@ -107,23 +101,26 @@ const { showHideHome, showHideAbout, showHideContact } = this.state;
   <div className="fixed-footer">
             <div className="container_hf">Copyright &copy; 2020</div>        
         </div>
- </div>
+ </Fragment>
       );
+      }
+      else{
+        return <div>Loading...</div>;
+      }
    }
 }
 
-
-function mapStateToProps(state) {
-  return {
-    claimList: state.claimList
+const mapStateToProps = (state) =>{
+  console.log("state ",state);
+  return{
+    claimList: state.claim.items,
+    loading: state.claim.loading,   
+    error: state.claim.error
   };
 }
 
 
-export default connect(
-  mapStateToProps,
-  { GetClaimList }
-)(ViewClaimSummary);
+export default connect(mapStateToProps)(ViewClaimSummary);
 
 
   

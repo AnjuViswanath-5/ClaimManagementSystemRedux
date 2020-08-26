@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react'
 import Select from 'react-select';
 import { Navbar } from 'react-bootstrap';
 import {Nav} from 'react-bootstrap';
@@ -13,7 +13,7 @@ class AboutComponent extends React.Component {
   var today = new Date(),
   date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
         this.state = {
-            username:this.props.location.state,
+          username: localStorage.getItem('loggedinUser'),
             date:date
           }
     
@@ -22,15 +22,10 @@ class AboutComponent extends React.Component {
       
         
    render() {   
-    let h2Style = {
-        color: 'White',
-  }   	 
-
-  let activeStyle = { color: '#ff3333' };
       return ( 
-          <div>          
+          <Fragment>          
          <Navbar bg="dark" variant="dark"  >
-          <h6 style={h2Style}>Claim Management System</h6>
+         <h6 style={{color: "white"}}>Claim Management System</h6>
         <Nav className="ml-auto">
       <Nav.Link >Welcome User!! {this.state.username}</Nav.Link>
       <Nav.Link >{this.state.date}</Nav.Link>
@@ -41,8 +36,8 @@ class AboutComponent extends React.Component {
       <Navbar bg="dark" variant="dark"  >
         <Nav className="mr-auto">
       <Nav.Link onClick={() => browserHistory.push('home')}>Home</Nav.Link>
-      <Nav.Link onClick={() => browserHistory.push('viewclaimsummary')} >Update Claim Summary</Nav.Link>
-      <Nav.Link style={activeStyle} href="#about">About</Nav.Link>
+      <Nav.Link onClick={() => browserHistory.push('viewclaimsummary')} >Update Claim</Nav.Link>
+      <Nav.Link style={{color: "red"}} href="#about">About</Nav.Link>
       <Nav.Link onClick={() => browserHistory.push('contact')} >Contact Us</Nav.Link>
         </Nav>
         </Navbar> 
@@ -52,7 +47,7 @@ class AboutComponent extends React.Component {
         <div className="fixed-footer">
             <div className="container_hf">Copyright &copy; 2020</div>        
         </div>
-</div>
+</Fragment>
  
       );
    }

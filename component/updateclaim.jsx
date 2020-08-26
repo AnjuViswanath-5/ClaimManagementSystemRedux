@@ -1,18 +1,9 @@
-import React from 'react';
-import Select from 'react-select';
+/* eslint-disable react/prop-types */
+import React, { Fragment } from 'react'
 import { Navbar } from 'react-bootstrap';
 import {Nav} from 'react-bootstrap';
-import { Router, Route, Link, browserHistory, IndexRoute } from 'react-router';
+import { browserHistory } from 'react-router';
 import axios from 'axios';
-
- const ClaimStatus = [
-  { label: "Pending", value: 1 },
-  { label: "Paid", value: 2 },
-  { label: "Submitted", value: 3 },
-  { label: "Recieved", value: 4 },
-  { label: "Denied", value: 5 },
-  { label: "Rejected", value: 6 },
- ];
 
 class UpdateClaim extends React.Component {
   constructor(props){
@@ -41,7 +32,7 @@ class UpdateClaim extends React.Component {
 
 this.handleChange = this.handleChange.bind(this);
 this.handleSubmit = this.handleSubmit.bind(this);
-};
+}
 
 
 componentDidMount() {
@@ -88,7 +79,7 @@ handleSubmit(e){
   e.preventDefault();
   // get our form data out of state
   const data=
-  { id:this.state.id, 
+  { id:this.state.empid, 
     name:this.state.name,
     claimno:this.state.claimno, 
     claimtype:this.state.claimtype,
@@ -99,8 +90,8 @@ handleSubmit(e){
   console.log(data);
   if (this.validateForm()) {
      
-  const claims=JSON.stringify(data);
-  console.log(claims);
+ // const claims=JSON.stringify(data);
+ // console.log(claims);
   axios.put(`http://localhost:7000/claims/update/${this.state.id}`,
    { "id":this.state.id,"name":this.state.name,"claimno":this.state.claimno, 
    "claimtype":this.state.claimtype,"claimdesc":this.state.claimdesc,
@@ -116,7 +107,6 @@ validateForm() {
 
   let errors = {};
   let formIsValid = true;
-  let validUser=false;
 
    if (this.state.claimno === "") {
      formIsValid = false;
@@ -149,7 +139,18 @@ validateForm() {
         formIsValid = false;
         errors["claiminvalid"] = "*Please select a valid Claim Number.";
       }
-  
+
+      if (this.state.claimstartdate <'01/01/1900')
+      {
+        formIsValid = false;
+        errors["minclaimstartdate"] = " Choose a Valid Claim Start Date.";
+       }
+      
+
+      if (this.state.claimstartdate >= this.state.claimenddate ) {
+        formIsValid = false;
+       errors["claimstartenddate"] = " Claim Start Date should be always less than Claim End Date.";
+      }
   
   this.setState({
     errors: errors
@@ -159,16 +160,12 @@ validateForm() {
 }
 
   render() {     
-    console.log(this.state.data);
-    let h2Style = {
-      color: 'White',
-              }
-              let activeStyle = { color: '#ff3333' };
+  
               
        return ( 
-         <div>
-        <Navbar bg="dark" variant="dark"  >
-          <h6 style={h2Style}>Claim Management System</h6>
+         <Fragment>
+        <Navbar bg="dark" variant="dark">
+        <h6 style={{color: "white"}}>Claim Management System</h6>
         <Nav className="ml-auto">
        <Nav.Link >Welcome User!!{this.state.username}</Nav.Link>
       <Nav.Link >{this.state.date}</Nav.Link>
@@ -179,7 +176,7 @@ validateForm() {
       <Navbar bg="dark" variant="dark"  >
       <Nav className="mr-auto">
       <Nav.Link onClick={() => browserHistory.push('home')}>Home</Nav.Link>
-      <Nav.Link  style={activeStyle} onClick={() => browserHistory.push('viewclaimsummary')} >Update Claim Summary</Nav.Link>
+      <Nav.Link  style={{color: "red"}} onClick={() => browserHistory.push('viewclaimsummary')} >Update Claim</Nav.Link>
       <Nav.Link href="#about">About</Nav.Link>
       <Nav.Link href="#contactus">Contact Us</Nav.Link>
         </Nav>
@@ -189,18 +186,18 @@ validateForm() {
         <div className="col-md-9">
       <div className="contact-form">
       <form method="post" onSubmit= {this.submitLoginForm}> 
-        {/* <div className="form-group">
+       <div className="form-group">
           <label className="control-label col-sm-4"  htmlFor="empid">Employee ID:</label>
           <div className="col-sm-10">          
-            <input type="text" defaultValue={this.state.data.id} className="form-control" id="empid"  name="empid" disabled={true} />
+            <input type="text" defaultValue={this.state.id} className="form-control" id="empid"  name="empid" disabled={true} />
           </div>
-        </div> */}
+        </div> 
         <div className="form-group">
           <label className="control-label col-sm-4" htmlFor="empname">Employee Name:</label>
           <div className="col-sm-10">          
             <input type="text" ref defaultValue={this.state.name} className="form-control" id="empname"   name="empname" disabled={true} />
           </div>
-         
+               
         </div>
         <div className="form-group">
           <label className="control-label col-sm-4" htmlFor="claimno">Claim Number:</label>
@@ -238,6 +235,7 @@ validateForm() {
               <input type="date" defaultValue={this.state.claimstartdate} className="form-control" id="claimstartdate" name="claimstartdate"  onChange={this.handleChange}/>
             </div>
             <div className="errorMsg">{this.state.errors.claimstartdate}</div>
+            <div className="errorMsg">{this.state.errors.minclaimstartdate}</div>
            </div>
           <div className="form-group">
             <label className="control-label col-sm-4" htmlFor="claimenddate">Claim End Date:</label>
@@ -245,6 +243,8 @@ validateForm() {
               <input type="date" defaultValue={this.state.claimenddate} className="form-control" id="claimenddate" name="claimenddate" onChange={this.handleChange}/>
             </div>
             <div className="errorMsg">{this.state.errors.claimenddate}</div>
+            <div className="errorMsg">{this.state.errors.claimstartenddate}</div>
+          
           </div>       
         <div className="form-group">        
           <div className="col-sm-offset-2 col-sm-10">
@@ -259,7 +259,7 @@ validateForm() {
 </div>
 </div>
 </div>
-</div>
+</Fragment>
 );
    }
 }

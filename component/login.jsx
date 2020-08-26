@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { Fragment } from 'react'
 import { Navbar } from 'react-bootstrap';
-import {Nav} from 'react-bootstrap';
-import { Router, Route, Link, browserHistory, IndexRoute, Redirect  } from 'react-router';
+import { browserHistory  } from 'react-router';
 import axios from 'axios';
+import { Logger } from 'react-logger-lib';
 
 class LoginComponent extends React.Component {
 
@@ -38,6 +38,7 @@ class LoginComponent extends React.Component {
                 fields["username"] = "";
                 fields["password"] = "";
                 this.setState({fields:fields});
+                localStorage.setItem('loggedinUser', this.state.fields["username"]);
               
                // browserHistory.push('viewclaimsummary')
                browserHistory.push({
@@ -54,6 +55,7 @@ class LoginComponent extends React.Component {
                 const userList = res.data;
                 this.setState({ userList });
                })
+               Logger.of('LoginComponent.componentDidMount').warn('state=', this.state);
           }
 
           validateUser()
@@ -61,15 +63,14 @@ class LoginComponent extends React.Component {
              let fields = this.state.fields;
              this.state.userList.map((user) => {
                   if (user.username === fields["username"]  && user.password ===fields["password"])  {
-                     this.state.validUser=true;
-                    //  const username=fields["username"];
-                    //  this.setState({username});
+                    const validUser=true;
+                    //this.setState({validUser});
+                    this.state.validUser=true;
+                     
                      console.log(this.state.username);
                     return this.state.validUser;
                    }});
                      return this.state.validUser;
-
-
           }
      
           validateForm() {
@@ -82,6 +83,7 @@ class LoginComponent extends React.Component {
             if (!fields["username"]) {
               formIsValid = false;
               errors["username"] = "*Please enter your username.";
+               Logger.of('LoginComponent.componentDidMount').warn('state=', this.state);
             } 
                 
             if (!fields["password"]) {
@@ -93,9 +95,12 @@ class LoginComponent extends React.Component {
               if (formIsValid == true && validUser == false)
               {
                   formIsValid = false;
+                  errors["invaliduser"] = "Invalid Credentials";
+                  console.log('Is invalid user' + validUser);
               }
-              errors["invaliduser"] = "Invalid Credentials";
+              
               console.log('Is valid user' + validUser);
+              Logger.of('Login.componentDidMount').warn('Invalid userSS');
             
             
             this.setState({
@@ -105,14 +110,11 @@ class LoginComponent extends React.Component {
        
           }
       
-   render() {   
-    let h2Style = {
-        color: 'White',
-  }   	 
+   render() {    	 
       return ( 
-          <div>          
+        <Fragment>          
         <Navbar bg="dark" variant="dark" fixed="top" >
-        <h6 style={h2Style}>Claim Management System</h6>
+        <h6 style={{color: "white"}}>Claim Management System</h6>
         </Navbar>
         <div className="login-form">
             <form method="post" onSubmit= {this.submitLoginForm}>   
@@ -133,7 +135,7 @@ class LoginComponent extends React.Component {
         <div className="fixed-footer">
             <div className="container_hf">Copyright &copy; 2020</div>        
         </div>
-</div>
+</Fragment>
  
       );
    }
